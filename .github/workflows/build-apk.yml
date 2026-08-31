@@ -48,11 +48,6 @@ jobs:
         run: |
           npx cap sync android
 
-      - name: Verify Android Project
-        run: |
-          test -f android/gradlew
-          echo "Android Gradle project created successfully."
-
       - name: Build Debug APK with Gradle
         working-directory: ./android
         run: |
