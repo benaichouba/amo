@@ -1,0 +1,8 @@
+{
+  "name": "DidactiPlan - Didactic Lesson Plan Generator",
+  "description": "Primary English Didactic Lesson Planner (3PS, 4PS, 5PS) aligned with the CNP Didactic Guide, multi-level class support, and official inspection printable session sheets. Created by Teacher Benaichouba Mohamed A.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
