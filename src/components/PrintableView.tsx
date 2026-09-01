@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LessonPlan } from '../types';
-import { Printer, ArrowLeft } from 'lucide-react';
+import { Printer, ArrowLeft, Download, Loader2, CheckCircle, FileText } from 'lucide-react';
+import { exportElementToPdf, printElementA4 } from '../utils/pdfExportHelper';
 
 interface PrintableViewProps {
   plan: LessonPlan;
@@ -11,6 +12,10 @@ export const PrintableView: React.FC<PrintableViewProps> = ({
   plan, 
   onBack
 }) => {
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
   const teacher = plan.teacherProfile;
   const learnersCount = 
     plan.gradeYear === '3PS' ? (teacher?.learners3PS || 32) :
@@ -30,30 +35,94 @@ export const PrintableView: React.FC<PrintableViewProps> = ({
     'Audio player / Chant'
   ])).slice(0, 5).join(', ');
 
+  const docTitle = `Lesson_Plan_${plan.gradeYear}_${plan.sequenceTitle.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 30)}`;
+
+  const handlePrint = () => {
+    setIsPrinting(true);
+    try {
+      printElementA4('printable-lesson-sheet', docTitle, 'portrait');
+    } catch (err) {
+      console.error('Print trigger error:', err);
+      window.print();
+    } finally {
+      setTimeout(() => setIsPrinting(false), 1500);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
+    setPdfSuccess(false);
+    try {
+      const filename = `${docTitle}_A4.pdf`;
+      await exportElementToPdf('printable-lesson-sheet', filename, 'portrait');
+      setPdfSuccess(true);
+      setTimeout(() => setPdfSuccess(false), 3000);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      // Fallback to print
+      handlePrint();
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
   return (
-    <div className="bg-slate-100 min-h-screen py-8 px-3 sm:px-6">
+    <div className="bg-slate-100 min-h-screen py-8 px-3 sm:px-6 print:bg-white print:p-0">
       
       {/* Action Bar (hidden on print) */}
       <div className="max-w-4xl mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 print:hidden">
         <button
           onClick={onBack}
-          className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-xs cursor-pointer"
+          className="inline-flex items-center px-4 py-2.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-xs cursor-pointer transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           <span>Back to Lesson Planner</span>
         </button>
 
-        <button
-          onClick={() => window.print()}
-          className="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 cursor-pointer"
-        >
-          <Printer className="w-4 h-4 mr-1.5" />
-          <span>Print / Save as PDF</span>
-        </button>
+        <div className="flex items-center space-x-2.5 w-full sm:w-auto justify-end">
+          {/* Save PDF Button */}
+          <button
+            onClick={handleExportPdf}
+            disabled={isExportingPdf}
+            className="inline-flex items-center px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-50 shadow-xs cursor-pointer transition-all disabled:opacity-50"
+            title="Download this lesson sheet directly as an A4 PDF document"
+          >
+            {isExportingPdf ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-emerald-600" />
+                <span>Generating A4 PDF...</span>
+              </>
+            ) : pdfSuccess ? (
+              <>
+                <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-600" />
+                <span>PDF Downloaded!</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-1.5 text-emerald-600" />
+                <span>Save A4 PDF</span>
+              </>
+            )}
+          </button>
+
+          {/* Print A4 Button */}
+          <button
+            onClick={handlePrint}
+            disabled={isPrinting}
+            className="inline-flex items-center px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 cursor-pointer transition-all disabled:opacity-50"
+            title="Open official A4 printer dialog"
+          >
+            <Printer className="w-4 h-4 mr-1.5 text-amber-300" />
+            <span>Print Sheet (A4)</span>
+          </button>
+        </div>
       </div>
 
       {/* Official Session Sheet (Exact Layout from Algerian Template) */}
-      <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 shadow-lg border border-slate-300 print:border-none print:shadow-none print:p-0 text-slate-900 text-xs font-sans space-y-3">
+      <div 
+        id="printable-lesson-sheet"
+        className="max-w-4xl mx-auto bg-white p-6 sm:p-10 shadow-lg border border-slate-300 print:border-none print:shadow-none print:p-0 text-slate-900 text-xs font-sans space-y-3 print:rounded-none rounded-2xl"
+      >
         
         {/* Row 1: Teacher & School (Warm Amber/Beige Pill) */}
         <div className="bg-[#fef3c7] border border-amber-300 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-amber-950 font-medium">
@@ -240,11 +309,11 @@ export const PrintableView: React.FC<PrintableViewProps> = ({
         {/* Footer Signature */}
         <div className="pt-4 border-t border-slate-300 flex justify-between items-end text-slate-700 text-[10px]">
           <div>
-            <span className="block font-bold">Teacher: {teacher?.fullName || 'Teacher Signature'}</span>
+            <span className="block font-bold">Teacher: {teacher?.fullName || 'Primary English Teacher'}</span>
             <span className="text-slate-500">Signature: _______________________</span>
           </div>
           <div className="text-right">
-            <span className="font-medium italic">DidactiPlan • Teacher Benaichouba Mohamed A.</span>
+            <span className="font-medium italic">DidactiPlan • Primary English Lesson Plan</span>
           </div>
         </div>
 

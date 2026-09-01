@@ -3,8 +3,8 @@ import { BookOpen, Sparkles, Cloud, CheckCircle2, Bookmark, HelpCircle, Graduati
 import { GoogleClassroomCourse, TeacherProfile, LicenseInfo } from '../types';
 
 interface HeaderProps {
-  activeTab: 'lesson_planner' | 'monthly_distribution';
-  onTabChange: (tab: 'lesson_planner' | 'monthly_distribution') => void;
+  activeTab: 'lesson_planner' | 'monthly_distribution' | 'yearly_distribution';
+  onTabChange: (tab: 'lesson_planner' | 'monthly_distribution' | 'yearly_distribution') => void;
   onOpenGuide: () => void;
   onOpenSaved: () => void;
   savedCount: number;
@@ -54,10 +54,12 @@ export const Header: React.FC<HeaderProps> = ({
               <p className="text-xs text-slate-500 hidden sm:flex items-center space-x-1.5">
                 <span>Primary English Didactic Lesson Planner</span>
                 <span className="text-slate-300">•</span>
-                <span className="font-semibold text-emerald-700">Created by Teacher Benaichouba Mohamed A.</span>
+                <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  Created & Developed by Teacher: Benaichouba Mohamed A.
+                </span>
               </p>
-              <p className="text-[10px] text-emerald-700 font-semibold sm:hidden">
-                Created by Teacher Benaichouba Mohamed A.
+              <p className="text-[10px] text-emerald-800 font-bold sm:hidden">
+                Created & Developed by Teacher: Benaichouba Mohamed A.
               </p>
             </div>
           </div>
@@ -90,6 +92,23 @@ export const Header: React.FC<HeaderProps> = ({
                 activeTab === 'monthly_distribution' ? 'bg-emerald-800 text-amber-200' : 'bg-amber-100 text-amber-900'
               }`}>
                 Pro
+              </span>
+            </button>
+
+            <button
+              onClick={() => onTabChange('yearly_distribution')}
+              className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                activeTab === 'yearly_distribution'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/50'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 mr-1.5 text-emerald-400" />
+              <span>Yearly Distribution</span>
+              <span className={`ml-1.5 px-1.5 py-0.2 rounded-md text-[9px] font-extrabold uppercase ${
+                activeTab === 'yearly_distribution' ? 'bg-slate-700 text-emerald-300' : 'bg-emerald-100 text-emerald-900'
+              }`}>
+                Official
               </span>
             </button>
           </nav>
@@ -173,24 +192,30 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden items-center justify-around py-2 border-t border-slate-100 text-xs">
           <button
             onClick={() => onTabChange('lesson_planner')}
-            className={`flex-1 py-1 text-center font-bold flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-1 text-center font-bold flex items-center justify-center space-x-1 ${
               activeTab === 'lesson_planner' ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-500'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Lesson Plans</span>
+            <span>Plans</span>
           </button>
           <button
             onClick={() => onTabChange('monthly_distribution')}
-            className={`flex-1 py-1 text-center font-bold flex items-center justify-center space-x-1.5 ${
+            className={`flex-1 py-1 text-center font-bold flex items-center justify-center space-x-1 ${
               activeTab === 'monthly_distribution' ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-500'
             }`}
           >
             <CalendarCheck className="w-3.5 h-3.5" />
-            <span>Monthly Distribution</span>
-            <span className="px-1 py-0.1 rounded text-[8px] font-extrabold bg-amber-100 text-amber-800 uppercase">
-              Pro
-            </span>
+            <span>Monthly</span>
+          </button>
+          <button
+            onClick={() => onTabChange('yearly_distribution')}
+            className={`flex-1 py-1 text-center font-bold flex items-center justify-center space-x-1 ${
+              activeTab === 'yearly_distribution' ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-500'
+            }`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            <span>Yearly</span>
           </button>
         </div>
 

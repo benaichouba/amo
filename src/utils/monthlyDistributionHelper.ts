@@ -1,5 +1,6 @@
 import { DidacticYear, MonthlyCalendarEvent, MonthlySessionPlan, MonthlyDistributionConfig, TeacherProfile, EventCategoryType } from '../types';
 import { DIDACTIC_GUIDE_3PS_PRESETS, DIDACTIC_GUIDE_4PS_PRESETS, DIDACTIC_GUIDE_5PS_PRESETS } from '../data/didacticCurriculum';
+import { SeptemberConfig, getMinistryCalendarForYear } from './ministryCalendarHelper';
 
 export const DAYS_OF_WEEK = [
   { dayIndex: 0, name: 'Sunday', short: 'Sun' },
@@ -32,127 +33,133 @@ export const MONTH_OPTIONS = [
 ];
 
 // ==========================================
+// ==========================================
 // Default Algerian Official School Holidays
 // ==========================================
-export const DEFAULT_ALGERIAN_HOLIDAYS: MonthlyCalendarEvent[] = [
-  {
-    id: 'holiday-revolution-day',
-    title: 'Revolution Day (1st November)',
-    date: '2025-11-01',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'National public holiday commemorating the outbreak of the Algerian War of Independence.'
-  },
-  {
-    id: 'holiday-autumn-break-2025',
-    title: 'Autumn School Holiday',
-    date: '2025-10-28',
-    endDate: '2025-11-02',
-    isSuspended: true,
-    category: 'school_break',
-    description: 'Official Ministry of National Education autumn break for primary schools.'
-  },
-  {
-    id: 'holiday-new-year-2026',
-    title: "New Year's Day",
-    date: '2026-01-01',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'Public holiday.'
-  },
-  {
-    id: 'holiday-yennayer-2026',
-    title: 'Yennayer (Amazigh New Year 2976)',
-    date: '2026-01-12',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'Official national holiday celebrating Amazigh heritage.'
-  },
-  {
-    id: 'holiday-winter-break-2025-2026',
-    title: 'Winter School Holiday (15 Days)',
-    date: '2025-12-18',
-    endDate: '2026-01-04',
-    isSuspended: true,
-    category: 'school_break',
-    description: 'Trimester 1 winter holidays for primary students.'
-  },
-  {
-    id: 'holiday-chahid-day-2026',
-    title: 'National Martyr / Chahid Day',
-    date: '2026-02-18',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'National remembrance day across all educational institutions.'
-  },
-  {
-    id: 'holiday-victory-day-2026',
-    title: 'Victory Day (Eid En-Nasr)',
-    date: '2026-03-19',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'National holiday.'
-  },
-  {
-    id: 'holiday-spring-break-2026',
-    title: 'Spring School Holiday (15 Days)',
-    date: '2026-03-19',
-    endDate: '2026-04-05',
-    isSuspended: true,
-    category: 'school_break',
-    description: 'Trimester 2 spring holidays for primary schools.'
-  },
-  {
-    id: 'holiday-eid-al-fitr-2026',
-    title: 'Eid al-Fitr (3 Days)',
-    date: '2026-03-20',
-    endDate: '2026-03-23',
-    isSuspended: true,
-    category: 'religious_holiday',
-    description: 'Religious Islamic holiday.'
-  },
-  {
-    id: 'holiday-knowledge-day-2026',
-    title: 'Youm El-Ilm (Knowledge Day)',
-    date: '2026-04-16',
-    isSuspended: false, // Normal school day with didactic activities commemorating Sheikh Ben Badis
-    category: 'school_event',
-    description: 'Commemoration of Sheikh Abdelhamid Ben Badis with educational projects.'
-  },
-  {
-    id: 'holiday-labour-day-2026',
-    title: 'Labour Day',
-    date: '2026-05-01',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'International Workers Day.'
-  },
-  {
-    id: 'holiday-eid-al-adha-2026',
-    title: 'Eid al-Adha (3 Days)',
-    date: '2026-05-27',
-    endDate: '2026-05-30',
-    isSuspended: true,
-    category: 'religious_holiday',
-    description: 'Religious Islamic holiday.'
-  },
-  {
-    id: 'holiday-islamic-new-year-2026',
-    title: 'Awal Muharram (1448 AH)',
-    date: '2026-06-17',
-    isSuspended: true,
-    category: 'religious_holiday',
-    description: 'Hijri New Year holiday.'
-  },
-  {
-    id: 'holiday-independence-day-2026',
-    title: 'Independence & Youth Day (5th July)',
-    date: '2026-07-05',
-    isSuspended: true,
-    category: 'national_holiday',
-    description: 'Algerian National Independence Day.'
-  }
-];
+export function getAlgerianHolidaysForYear(year: number = 2026): MonthlyCalendarEvent[] {
+  const nextYear = year + 1;
+  return [
+    {
+      id: `holiday-revolution-day-${year}`,
+      title: 'Revolution Day (1st November)',
+      date: `${year}-11-01`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'National public holiday commemorating the outbreak of the Algerian War of Independence.'
+    },
+    {
+      id: `holiday-autumn-break-${year}`,
+      title: 'Autumn School Holiday',
+      date: `${year}-10-28`,
+      endDate: `${year}-11-02`,
+      isSuspended: true,
+      category: 'school_break',
+      description: 'Official Ministry of National Education autumn break for primary schools.'
+    },
+    {
+      id: `holiday-new-year-${nextYear}`,
+      title: "New Year's Day",
+      date: `${nextYear}-01-01`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'Public holiday.'
+    },
+    {
+      id: `holiday-yennayer-${nextYear}`,
+      title: `Yennayer (Amazigh New Year ${nextYear + 950})`,
+      date: `${nextYear}-01-12`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'Official national holiday celebrating Amazigh heritage.'
+    },
+    {
+      id: `holiday-winter-break-${year}-${nextYear}`,
+      title: 'Winter School Holiday (15 Days)',
+      date: `${year}-12-18`,
+      endDate: `${nextYear}-01-04`,
+      isSuspended: true,
+      category: 'school_break',
+      description: 'Trimester 1 winter holidays for primary students.'
+    },
+    {
+      id: `holiday-chahid-day-${nextYear}`,
+      title: 'National Martyr / Chahid Day',
+      date: `${nextYear}-02-18`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'National remembrance day across all educational institutions.'
+    },
+    {
+      id: `holiday-victory-day-${nextYear}`,
+      title: 'Victory Day (Eid En-Nasr)',
+      date: `${nextYear}-03-19`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'National holiday.'
+    },
+    {
+      id: `holiday-spring-break-${nextYear}`,
+      title: 'Spring School Holiday (15 Days)',
+      date: `${nextYear}-03-19`,
+      endDate: `${nextYear}-04-05`,
+      isSuspended: true,
+      category: 'school_break',
+      description: 'Trimester 2 spring holidays for primary schools.'
+    },
+    {
+      id: `holiday-eid-al-fitr-${nextYear}`,
+      title: 'Eid al-Fitr (3 Days)',
+      date: `${nextYear}-03-20`,
+      endDate: `${nextYear}-03-23`,
+      isSuspended: true,
+      category: 'religious_holiday',
+      description: 'Religious Islamic holiday.'
+    },
+    {
+      id: `holiday-knowledge-day-${nextYear}`,
+      title: 'Youm El-Ilm (Knowledge Day)',
+      date: `${nextYear}-04-16`,
+      isSuspended: false, // Normal school day with didactic activities commemorating Sheikh Ben Badis
+      category: 'school_event',
+      description: 'Commemoration of Sheikh Abdelhamid Ben Badis with educational projects.'
+    },
+    {
+      id: `holiday-labour-day-${nextYear}`,
+      title: 'Labour Day',
+      date: `${nextYear}-05-01`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'International Workers Day.'
+    },
+    {
+      id: `holiday-eid-al-adha-${nextYear}`,
+      title: 'Eid al-Adha (3 Days)',
+      date: `${nextYear}-05-27`,
+      endDate: `${nextYear}-05-30`,
+      isSuspended: true,
+      category: 'religious_holiday',
+      description: 'Religious Islamic holiday.'
+    },
+    {
+      id: `holiday-islamic-new-year-${nextYear}`,
+      title: 'Awal Muharram (Hijri New Year)',
+      date: `${nextYear}-06-17`,
+      isSuspended: true,
+      category: 'religious_holiday',
+      description: 'Hijri New Year holiday.'
+    },
+    {
+      id: `holiday-independence-day-${nextYear}`,
+      title: 'Independence & Youth Day (5th July)',
+      date: `${nextYear}-07-05`,
+      isSuspended: true,
+      category: 'national_holiday',
+      description: 'Algerian National Independence Day.'
+    }
+  ];
+}
+
+export const DEFAULT_ALGERIAN_HOLIDAYS: MonthlyCalendarEvent[] = getAlgerianHolidaysForYear(2026);
 
 // Helper to check if a specific date string (YYYY-MM-DD) falls within an event
 export function findEventForDate(dateStr: string, events: MonthlyCalendarEvent[]): MonthlyCalendarEvent | undefined {
@@ -391,9 +398,12 @@ export function generateMonthlyDistribution(
   gradeYear: DidacticYear,
   customEvents: MonthlyCalendarEvent[] = [],
   teacherProfile?: TeacherProfile,
-  lastTaughtSession?: LastTaughtSessionConfig
+  lastTaughtSession?: LastTaughtSessionConfig,
+  septemberConfig?: SeptemberConfig
 ): MonthlyDistributionConfig {
-  const allEvents = [...DEFAULT_ALGERIAN_HOLIDAYS, ...customEvents];
+  const holidaysForYear = getAlgerianHolidaysForYear(year);
+  const ministryCalendar = getMinistryCalendarForYear(year);
+  const allEvents = [...holidaysForYear, ...customEvents];
   
   // Pick curriculum presets based on grade
   let presets = DIDACTIC_GUIDE_3PS_PRESETS;
@@ -404,6 +414,15 @@ export function generateMonthlyDistribution(
 
   // Compute starting state: starts with the session that follows the last taught one, or Session 1 if starting fresh
   let currentPointer: { sequenceNumber: number; sectionNumber: number; sessionNumber: number };
+
+  // Needs introductory encounter session if starting at the very beginning of the school year (Sequence 1, Section 1, and sessionNumber === 0)
+  // or default in September when starting fresh.
+  let pendingIntroductorySession = (
+    (!lastTaughtSession && (month === 9 || month === 10)) ||
+    (lastTaughtSession?.sequenceNumber === 1 && 
+     lastTaughtSession?.sectionNumber === 1 && 
+     lastTaughtSession?.sessionNumber === 0)
+  );
 
   if (lastTaughtSession) {
     currentPointer = calculateStartingSession(
@@ -434,30 +453,52 @@ export function generateMonthlyDistribution(
   for (let week = 1; week <= 4; week++) {
     for (let sessNum = 1; sessNum <= 2; sessNum++) {
       
-      // Determine if this week / session corresponds to a holiday suspension
+      // Determine if this week / session corresponds to a holiday suspension or pre-school period
       let suspendedEvent: MonthlyCalendarEvent | undefined = undefined;
+
+      // Special handling for September School Start
+      if (month === 9) {
+        const sepMode = septemberConfig?.mode || 'ministry_auto';
+        const activeWeeks = septemberConfig?.activeWeeks || [3, 4];
+
+        if (sepMode === 'ministry_auto' || sepMode === 'weeks_3_4' || sepMode === 'custom_date') {
+          if (!activeWeeks.includes(week)) {
+            // Pre-rentrée administrative reception & teacher pedagogical organization
+            suspendedEvent = {
+              id: `pre-rentree-september-w${week}`,
+              title: week === 1 
+                ? 'الدخول الإداري والتحضير البيداغوجي (Staff Rentrée & Pedagogical Councils)' 
+                : 'دخول الأساتذة واستقبال الأفواج (Teacher Rentrée & Welcoming Cohorts)',
+              date: `${year}-09-${week === 1 ? '07' : '14'}`,
+              isSuspended: true,
+              category: 'school_event',
+              description: `الفترة السابقة لانطلاق الدروس الرسمية وفق رزنامة وزارة التربية الوطنية (${ministryCalendar.pupilsEntryDate}).`
+            };
+          }
+        }
+      }
       
-      if (month === 11 && week === 1) {
+      if (!suspendedEvent && month === 11 && week === 1) {
         // November 1st Revolution Day & Autumn Break
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-revolution-day' || e.id === 'holiday-autumn-break-2025');
-      } else if (month === 12 && (week === 3 || week === 4)) {
+        suspendedEvent = allEvents.find(e => e.id.includes('revolution-day') || e.id.includes('autumn-break'));
+      } else if (!suspendedEvent && month === 12 && (week === 3 || week === 4)) {
         // Winter break
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-winter-break-2025-2026');
-      } else if (month === 1 && week === 1) {
+        suspendedEvent = allEvents.find(e => e.id.includes('winter-break'));
+      } else if (!suspendedEvent && month === 1 && week === 1) {
         // Winter break continuation / New Year
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-winter-break-2025-2026' || e.id === 'holiday-new-year-2026');
-      } else if (month === 1 && week === 2 && sessNum === 2) {
+        suspendedEvent = allEvents.find(e => e.id.includes('winter-break') || e.id.includes('new-year'));
+      } else if (!suspendedEvent && month === 1 && week === 2 && sessNum === 2) {
         // Yennayer Jan 12
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-yennayer-2026');
-      } else if (month === 3 && (week === 3 || week === 4)) {
+        suspendedEvent = allEvents.find(e => e.id.includes('yennayer'));
+      } else if (!suspendedEvent && month === 3 && (week === 3 || week === 4)) {
         // Spring break / Eid al-Fitr
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-spring-break-2026' || e.id === 'holiday-eid-al-fitr-2026');
-      } else if (month === 5 && week === 1 && sessNum === 1) {
+        suspendedEvent = allEvents.find(e => e.id.includes('spring-break') || e.id.includes('eid-al-fitr'));
+      } else if (!suspendedEvent && month === 5 && week === 1 && sessNum === 1) {
         // Labour Day May 1st
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-labour-day-2026');
-      } else if (month === 5 && week === 4) {
+        suspendedEvent = allEvents.find(e => e.id.includes('labour-day'));
+      } else if (!suspendedEvent && month === 5 && week === 4) {
         // Eid al-Adha
-        suspendedEvent = allEvents.find(e => e.id === 'holiday-eid-al-adha-2026');
+        suspendedEvent = allEvents.find(e => e.id.includes('eid-al-adha'));
       }
 
       // Check any custom added event matching this month
@@ -506,18 +547,68 @@ export function generateMonthlyDistribution(
         continue;
       }
 
+      // Check if an introductory encounter session is pending before Session 1 (I Sing and Have Fun)
+      if (pendingIntroductorySession) {
+        const introPreset = presets.find(p => p.sequenceNumber === 1 && p.sectionNumber === 1) || presets[0];
+        const introPlan: MonthlySessionPlan = {
+          id: `dist-${gradeYear}-${year}-${month}-w${week}-s${sessNum}`,
+          weekNumber: week,
+          sessionNumber: sessNum as 1 | 2,
+          date: `Week ${week}, Session ${sessNum}`,
+          dayName: `Session ${sessNum}`,
+          year: gradeYear,
+          sequenceNumber: 1,
+          sequenceTitle: introPreset?.sequenceTitle ? `Sequence 1: ${introPreset.sequenceTitle}` : `Sequence 1`,
+          sectionNumber: 1,
+          sectionTitle: `Introductory Contact & Highlight Classroom Rules`,
+          sessionName: 'Introductory Session: Initial Meeting, Introductions & highlight Classroom Rules',
+          sessionType: 'First Encounter: Teacher-Pupil Contact, Classroom Rules & School Supplies',
+          communicativeObjectives: [
+            'Initial meeting & greetings: Establish warm contact between teacher and pupils, reciprocal self-introductions ("Hello! / My name is...").',
+            'Classroom rules & conduct: Establish essential classroom routines, polite interaction norms (Raise hand, listen attentively, quiet please).',
+            'English school supplies: Inform pupils about required English materials (Coursebook, 64p copybook, slate, felt pen/chalk, colored pencils).'
+          ],
+          vocabulary: ['hello', 'good morning', 'teacher', 'pupil', 'name', 'copybook', 'slate', 'pencil', 'book', 'please', 'thank you'],
+          grammar: ['Greetings: Hello / Good morning', 'Formulaic intro: My name is...', 'Classroom commands: Stand up / Sit down / Raise your hand / Listen'],
+          phonics: 'Auditory recognition of greeting formulas and initial consonant sounds',
+          handwritingFamily: 'Pencil grip, paper posture & slate handling orientation',
+          didacticAids: [
+            'Classroom Rules Chart / Poster',
+            'English School Supplies Realia (Coursebook, copybook, slate, pencil case)',
+            'Teacher Name Tag / Badge',
+            'Individual Slates'
+          ],
+          values: ['Mutual respect, active listening, classroom order, and enthusiasm for learning English'],
+          isSuspended: false,
+          status: 'scheduled',
+          presetId: introPreset?.id,
+          notes: 'Initial introductory session: teacher-student introductions, establishing classroom rules, and informing students about required school supplies.'
+        };
+
+        sessionPlans.push(introPlan);
+        pendingIntroductorySession = false;
+        // Keep currentPointer at Sequence 1, Section 1, Session 1 ("I sing and have fun...") for the very next active session!
+        currentPointer = { sequenceNumber: 1, sectionNumber: 1, sessionNumber: 1 };
+        continue;
+      }
+
       // Active didactic session: Find matching preset
       const currentPreset = presets.find(
         p => p.sequenceNumber === currentPointer.sequenceNumber && p.sectionNumber === currentPointer.sectionNumber
       ) || presets.find(p => p.sequenceNumber === currentPointer.sequenceNumber) || presets[0];
 
       const rubric = sessionTypesList.find(r => r.sessionNumber === currentPointer.sessionNumber) || sessionTypesList[0];
-      
+
       // Objective copied directly from didactic guide presets
       const guidePresetObj = currentPreset?.communicativeObjectives?.[(currentPointer.sessionNumber - 1) % (currentPreset.communicativeObjectives?.length || 1)];
       const officialObjective = guidePresetObj 
         ? `${guidePresetObj} (Official Algerian Primary English Didactic Guide).`
         : rubric.rubricObjective;
+
+      const communicativeObjectives: string[] = [
+        officialObjective,
+        `Consolidate active lexis through TPR, individual slates, flashcards, and peer dialogues.`
+      ];
 
       const plan: MonthlySessionPlan = {
         id: `dist-${gradeYear}-${year}-${month}-w${week}-s${sessNum}`,
@@ -532,10 +623,7 @@ export function generateMonthlyDistribution(
         sectionTitle: currentPreset?.sectionTitle ? `Section ${currentPointer.sectionNumber}: ${currentPreset.sectionTitle}` : `Section ${currentPointer.sectionNumber}`,
         sessionName: rubric.title,
         sessionType: rubric.type,
-        communicativeObjectives: [
-          officialObjective,
-          `Consolidate active lexis through TPR, individual slates, flashcards, and peer dialogues.`
-        ],
+        communicativeObjectives,
         vocabulary: currentPreset?.vocabulary?.slice(0, 5) || ['family', 'friend', 'school', 'numbers', 'greetings'],
         grammar: currentPreset?.grammar?.slice(0, 2) || ['Demonstratives (This is my...)', 'Wh-questions'],
         phonics: currentPreset?.phonics || 'Auditory isolation & phonic contrast',
@@ -545,7 +633,7 @@ export function generateMonthlyDistribution(
         isSuspended: false,
         status: 'scheduled',
         presetId: currentPreset?.id,
-        notes: `Official 60-minute Algerian Primary syllabus session.`
+        notes: `Official ${gradeYear === '5PS' ? '45' : '60'}-minute Algerian Primary syllabus session.`
       };
 
       sessionPlans.push(plan);
@@ -567,7 +655,7 @@ export function generateMonthlyDistribution(
   };
 
   // Academic year automatically derived from teacher registration profile or default
-  const academicYear = teacherProfile?.academicYear?.trim() || '2025/2026';
+  const academicYear = teacherProfile?.academicYear?.trim() || '2026/2027';
 
   return {
     id: `monthly-dist-${gradeYear}-${year}-${month}`,
@@ -580,7 +668,7 @@ export function generateMonthlyDistribution(
     sessions: sessionPlans,
     customEvents,
     teacherProfile,
-    pedagogicalRemarks: `Monthly lesson distribution prepared according to the official Algerian Primary English Curriculum. Exactly 2 sessions of 60 minutes per week across 4 weeks (8 sessions total).`,
+    pedagogicalRemarks: `Monthly lesson distribution prepared according to the official Algerian Primary English Curriculum. Exactly 2 sessions of ${gradeYear === '5PS' ? '45' : '60'} minutes per week across 4 weeks (8 sessions total).`,
     lastUpdated: new Date().toISOString()
   };
 }

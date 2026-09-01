@@ -2,8 +2,35 @@ export type SubjectType = 'english_primary' | 'english';
 
 export type DidacticYear = '3PS' | '4PS' | '5PS' | 'Year 3 (Primary)' | 'Year 4 (Primary)' | 'Year 5 (Primary)';
 
+export const CALENDAR_YEARS_LIST: number[] = [
+  2026,
+  2027,
+  2028,
+  2029,
+  2030,
+  2031,
+  2032,
+  2033,
+  2034,
+  2035
+];
+
+export const ACADEMIC_YEARS_LIST: string[] = [
+  '2026 / 2027',
+  '2027 / 2028',
+  '2028 / 2029',
+  '2029 / 2030',
+  '2030 / 2031',
+  '2031 / 2032',
+  '2032 / 2033',
+  '2033 / 2034',
+  '2034 / 2035',
+  '2035 / 2036'
+];
+
 export interface TeacherProfile {
   fullName: string;
+  phone?: string;
   schoolName: string;
   district?: string;
   academicYear?: string;
@@ -207,6 +234,7 @@ export interface LicenseInfo {
   planName?: string;
   referenceNumber?: string;
   customerName?: string;
+  customerPhone?: string;
   priceDZD?: number;
   expiresAt?: string;
 }

@@ -63,7 +63,7 @@ export const DIDACTIC_GUIDE_3PS_PRESETS: DidacticPreset[] = [
       'Introduce a friend and ask peer questions: "How old are you? - I am 8."',
       'Count and recognize numbers from 0 to 10 in oral and written form'
     ],
-    vocabulary: ['friend', 'mate', 'numbers (0-10): zero, one, two, three, four, five, six, seven, eight, nine, ten', 'live', 'speak', 'English', 'Arabic'],
+    vocabulary: ['friend', 'mate', 'numbers (0-10): zero, one, two, three, four, five, six, seven, eight, nine, ten', 'live', 'speak', 'English', 'National Language'],
     grammar: ['Present simple: to be (I am), to live (I live in...)', 'Wh-questions: What’s your name? How old are you? Where do you live?'],
     phonics: 'Short vowel sound /i/ in "six", "in", "live". CVC word decoding.',
     handwritingFamily: 'Family 1: Print UPPERCASE (I, J, L, T, U) and capital personal pronoun "I"',
@@ -114,12 +114,12 @@ export const DIDACTIC_GUIDE_3PS_PRESETS: DidacticPreset[] = [
     sessionType: 'Full Sequence',
     sessionName: 'Weekly Timetable, Academic Disciplines & Routine',
     communicativeObjectives: [
-      'Name school subjects (Arabic, English, Maths, Science, Islamic Education, Art, Sport)',
+      'Name school subjects (National Language, English, Maths, Science, Civic Education, Art, Sport)',
       'Recite and read the 7 days of the week in chronological order',
       'Ask and answer questions about weekly timetable: "When do you have English? - On Sunday."',
       'Express favorite school subjects: "My favorite subject is Art."'
     ],
-    vocabulary: ['Arabic', 'English', 'Maths', 'Science', 'Islamic Education', 'Art', 'Sport', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    vocabulary: ['National Language', 'English', 'Maths', 'Science', 'Civic Education', 'Art', 'Sport', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     grammar: ['Preposition of time: on (on Monday, on Wednesday)', 'Wh-questions: When do you have...? What’s your favourite subject?'],
     phonics: 'Short vowel sound /ʌ/ spelt "u" in "under", "number", "Sunday". Capitalization of days of the week.',
     handwritingFamily: 'Family 2: Print UPPERCASE (B, H, K, M, N, P, R) - Days of the week capitalization',
@@ -394,7 +394,7 @@ export const DIDACTIC_GUIDE_4PS_PRESETS: DidacticPreset[] = [
     sessionName: 'Countries, Nationalities, Languages & ID Card Form',
     communicativeObjectives: [
       'Introduce international friends and e-pals (name, country, nationality, language)',
-      'Ask and answer: "Where are you from? - I am from Algeria. I am Algerian. I speak Arabic and English."',
+      'Ask and answer: "Where are you from? - I am from Algeria. I am Algerian. I speak English."',
       'Fill in an ID card or profile registration form with accurate capitalisation'
     ],
     vocabulary: ['e-pal', 'country', 'nationality', 'Algeria/Algerian', 'England/English', 'France/French', 'Tunisia/Tunisian', 'Palestine/Palestinian', 'China/Chinese', 'Spain/Spanish', 'speak', 'flag'],

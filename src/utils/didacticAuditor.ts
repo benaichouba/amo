@@ -123,7 +123,7 @@ export function auditLessonPlan(plan: LessonPlan): DidacticAuditReport {
       strengths.push(`Explicit phonemic awareness target defined: ${plan.linguisticResources.phonicsSounds.join(', ')}`);
     }
 
-    // Check Arabic L1 Left-to-Right orientation reminder
+    // Check L1 Left-to-Right orientation reminder
     const hasL1Note = plan.classProfile?.l1LiteracyNotes && plan.classProfile.l1LiteracyNotes.length > 10;
     if (!hasL1Note) {
       issues.push({
@@ -131,7 +131,7 @@ export function auditLessonPlan(plan: LessonPlan): DidacticAuditReport {
         severity: 'info',
         category: 'phonics_handwriting',
         title: 'Left-to-Right Literacy Directionality Note Recommended',
-        message: 'Since Algerian pupils write Right-to-Left in Arabic/Tamazight, didactic sheets should highlight explicit orientation cues (anticlockwise strokes, left-to-right margins).',
+        message: 'Since primary pupils are accustomed to Right-to-Left script in home literacy, didactic sheets should highlight explicit orientation cues (anticlockwise strokes, left-to-right margins).',
         recommendation: 'Include a note on L1-to-L2 script transfer and anticlockwise/downward letter families.',
         canAutoFix: true,
         autoFixLabel: 'Add L1 Left-to-Right Orientation Note',
@@ -342,7 +342,7 @@ export function applyAuditAutoFix(plan: LessonPlan, autoFixAction: string): Less
     case 'add_l1_note': {
       if (!updated.classProfile.l1LiteracyNotes) {
         updated.classProfile.l1LiteracyNotes = 
-          'Learners write Right-to-Left in Arabic/Tamazight. Requires explicit orientation support for English Left-to-Right margins, top-to-bottom stroke order, and anticlockwise letter family formation.';
+          'Learners write Right-to-Left in home literacy. Requires explicit orientation support for English Left-to-Right margins, top-to-bottom stroke order, and anticlockwise letter family formation.';
       }
       break;
     }

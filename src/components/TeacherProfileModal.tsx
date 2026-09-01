@@ -12,7 +12,7 @@ import {
   Sparkles,
   BookOpen
 } from 'lucide-react';
-import { TeacherProfile } from '../types';
+import { TeacherProfile, ACADEMIC_YEARS_LIST } from '../types';
 
 interface TeacherProfileModalProps {
   isOpen: boolean;
@@ -27,26 +27,26 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
   profile,
   onSaveProfile
 }) => {
-  const [fullName, setFullName] = useState(profile.fullName || 'Teacher Benaichouba Mohamed A.');
-  const [schoolName, setSchoolName] = useState(profile.schoolName || 'Ziani Mohamed Primary School');
+  const [fullName, setFullName] = useState(profile.fullName || '');
+  const [schoolName, setSchoolName] = useState(profile.schoolName || '');
   const [district, setDistrict] = useState(profile.district || '');
-  const [academicYear, setAcademicYear] = useState(profile.academicYear || '2025 / 2026');
-  const [learners3PS, setLearners3PS] = useState<number>(profile.learners3PS || 32);
-  const [learners4PS, setLearners4PS] = useState<number>(profile.learners4PS || 34);
-  const [learners5PS, setLearners5PS] = useState<number>(profile.learners5PS || 30);
+  const [academicYear, setAcademicYear] = useState(profile.academicYear || '2026 / 2027');
+  const [learners3PS, setLearners3PS] = useState<number>(profile.learners3PS || 0);
+  const [learners4PS, setLearners4PS] = useState<number>(profile.learners4PS || 0);
+  const [learners5PS, setLearners5PS] = useState<number>(profile.learners5PS || 0);
   const [classesCount3PS, setClassesCount3PS] = useState<number>(profile.classesCount3PS || 1);
   const [classesCount4PS, setClassesCount4PS] = useState<number>(profile.classesCount4PS || 1);
   const [classesCount5PS, setClassesCount5PS] = useState<number>(profile.classesCount5PS || 1);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
-    setFullName(profile.fullName || 'Teacher Benaichouba Mohamed A.');
-    setSchoolName(profile.schoolName || 'Ziani Mohamed Primary School');
+    setFullName(profile.fullName || '');
+    setSchoolName(profile.schoolName || '');
     setDistrict(profile.district || '');
-    setAcademicYear(profile.academicYear || '2025 / 2026');
-    setLearners3PS(profile.learners3PS || 32);
-    setLearners4PS(profile.learners4PS || 34);
-    setLearners5PS(profile.learners5PS || 30);
+    setAcademicYear(profile.academicYear || '2026 / 2027');
+    setLearners3PS(profile.learners3PS || 0);
+    setLearners4PS(profile.learners4PS || 0);
+    setLearners5PS(profile.learners5PS || 0);
     setClassesCount3PS(profile.classesCount3PS || 1);
     setClassesCount4PS(profile.classesCount4PS || 1);
     setClassesCount5PS(profile.classesCount5PS || 1);
@@ -57,10 +57,10 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const updated: TeacherProfile = {
-      fullName: fullName.trim() || 'Teacher Benaichouba Mohamed A.',
-      schoolName: schoolName.trim() || 'Ziani Mohamed Primary School',
-      district: district.trim() || 'District of Primary Education',
-      academicYear: academicYear.trim() || '2025 / 2026',
+      fullName: fullName.trim(),
+      schoolName: schoolName.trim(),
+      district: district.trim(),
+      academicYear: academicYear.trim() || '2026 / 2027',
       learners3PS: Math.max(0, Number(learners3PS) || 0),
       learners4PS: Math.max(0, Number(learners4PS) || 0),
       learners5PS: Math.max(0, Number(learners5PS) || 0),
@@ -94,12 +94,8 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-emerald-100 mt-0.5">
-                Official credentials for Pedagogical Session Sheets (Page 75) & Class Registers
+                Official credentials for Pedagogical Session Sheets & Monthly Curriculum Distribution
               </p>
-              <div className="mt-1 text-[11px] font-semibold text-emerald-200 flex items-center space-x-1">
-                <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
-                <span>Created by Teacher Benaichouba Mohamed A.</span>
-              </div>
             </div>
           </div>
           <button
@@ -128,7 +124,7 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Teacher Benaichouba Mohamed A."
+                placeholder="e.g. Enter teacher's full name"
                 className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all"
               />
             </div>
@@ -151,7 +147,7 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
                   required
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
-                  placeholder="e.g. Ziani Mohamed Primary School"
+                  placeholder="e.g. Enter primary school name"
                   className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all"
                 />
               </div>
@@ -170,7 +166,7 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
                   type="text"
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  placeholder="e.g. District 02 - Directorate of Education"
+                  placeholder="e.g. District 01 - Directorate of Education"
                   className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all"
                 />
               </div>
@@ -180,21 +176,26 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
           {/* Academic Year */}
           <div>
             <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Academic Year
+              Academic Year (2026 / 2027 to 2035 / 2036)
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <Calendar className="w-4 h-4" />
               </div>
-              <input
-                id="teacher-academic-year-input"
-                type="text"
+              <select
+                id="teacher-academic-year-select"
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
-                placeholder="2025 / 2026"
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
-              />
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-bold focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none cursor-pointer"
+              >
+                {ACADEMIC_YEARS_LIST.map((yearOption) => (
+                  <option key={yearOption} value={yearOption}>
+                    {yearOption} {yearOption === '2026 / 2027' ? '(Current)' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
+            <p className="text-[11px] text-slate-500 mt-1">Official Algerian academic year range for curriculum planning (2026–2035).</p>
           </div>
 
           {/* Multi-Class & Number of Learners for Each Level (3PS, 4PS, 5PS) */}
@@ -331,7 +332,7 @@ export const TeacherProfileModal: React.FC<TeacherProfileModalProps> = ({
           {/* Action Buttons */}
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <div className="text-[11px] text-slate-500 italic">
-              "Created by Teacher Benaichouba Mohamed A."
+              DidactiPlan Primary English
             </div>
 
             <div className="flex items-center space-x-2">

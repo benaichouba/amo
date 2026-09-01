@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Printer, Download, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
 import { MonthlyDistributionConfig, TeacherProfile, MonthlySessionPlan } from '../types';
-import { exportElementToPdf } from '../utils/pdfExportHelper';
+import { exportElementToPdf, printElementA4 } from '../utils/pdfExportHelper';
 
 interface PrintableMonthlyDistributionProps {
   distribution: MonthlyDistributionConfig;
@@ -16,23 +16,34 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
 }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const safeMonth = distribution.monthName.replace(/\s+/g, '_');
+  const filename = `Monthly_Distribution_${distribution.gradeYear}_${safeMonth}_${teacherProfile.academicYear || '2026-2027'}.pdf`;
+  const docTitle = `Monthly_Distribution_${distribution.gradeYear}_${safeMonth}`;
 
   const handlePrint = () => {
-    window.print();
+    setIsPrinting(true);
+    try {
+      printElementA4('printable-distribution-sheet', docTitle, 'landscape');
+    } catch (err) {
+      console.error('Print failed:', err);
+      window.print();
+    } finally {
+      setTimeout(() => setIsPrinting(false), 1500);
+    }
   };
 
   const handleExportPdf = async () => {
     try {
       setIsExporting(true);
-      const safeMonth = distribution.monthName.replace(/\s+/g, '_');
-      const filename = `Monthly_Distribution_${distribution.gradeYear}_${safeMonth}_${teacherProfile.academicYear || '2025-2026'}.pdf`;
-      await exportElementToPdf('printable-distribution-sheet', filename);
+      await exportElementToPdf('printable-distribution-sheet', filename, 'landscape');
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (error) {
       console.error('PDF export failed:', error);
-      // Fallback to window.print() if canvas fails
-      window.print();
+      // Fallback to print
+      handlePrint();
     } finally {
       setIsExporting(false);
     }
@@ -132,7 +143,7 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
             <div>
               <span className="block text-[10px] uppercase font-bold text-slate-500">Academic Year</span>
               <span className="font-bold text-emerald-800">
-                {teacherProfile.academicYear || '2025/2026'}
+                {teacherProfile.academicYear || '2026 / 2027'}
               </span>
             </div>
           </div>
@@ -143,7 +154,7 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
               Monthly Distribution of {distribution.monthName}
             </h1>
             <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
-              Primary English Curriculum • 4 Weeks × 2 Sessions / Week (60 min each)
+              Primary English Curriculum • 4 Weeks × 2 Sessions / Week ({distribution.gradeYear === '5PS' ? '45' : '60'} min each)
             </p>
           </div>
 
@@ -174,7 +185,7 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
                       Session {sessNum}
                     </div>
                     <div className="text-[9px] text-slate-500 mt-0.5 font-normal">
-                      60 Minutes
+                      {distribution.gradeYear === '5PS' ? '45' : '60'} Minutes
                     </div>
                   </td>
 
@@ -208,8 +219,15 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
                         <div className="space-y-1">
                           
                           {/* Sequence & Section */}
-                          <div className="font-bold text-emerald-950 text-[9.5px]">
-                            {session.sequenceTitle}
+                          <div className="flex items-center justify-between gap-1">
+                            <div className="font-bold text-emerald-950 text-[9.5px]">
+                              {session.sequenceTitle}
+                            </div>
+                            {session.sessionType.includes('First Encounter') && !session.isSuspended && (
+                              <span className="px-1 py-0.2 rounded text-[8px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                                Introductions & Rules
+                              </span>
+                            )}
                           </div>
                           <div className="text-[9px] text-slate-600 font-medium">
                             {session.sectionTitle}
@@ -246,17 +264,8 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
           </table>
         </div>
 
-        {/* Pedagogical Observations & Notes */}
-        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[10px] mb-6">
-          <span className="font-bold text-slate-800 block mb-0.5">Pedagogical Notes:</span>
-          <p className="text-[9.5px] text-slate-600 leading-relaxed">
-            - Teaching conforms to the Algerian National Curriculum Framework and Didactic Guide for Primary English (2 sessions of 60 min/week).<br />
-            - In case of school holidays or exceptional closures, pedagogical objectives shift forward to maintain didactic continuity.
-          </p>
-        </div>
-
         {/* Official Signatures Block Requested at the Bottom */}
-        <div className="grid grid-cols-3 gap-6 text-center pt-5 border-t-2 border-slate-900 text-xs font-bold text-slate-900">
+        <div className="grid grid-cols-3 gap-6 text-center pt-6 border-t-2 border-slate-900 text-xs font-bold text-slate-900">
           <div className="space-y-12">
             <p className="tracking-wide uppercase text-[11px]">Teacher Signature</p>
             <div className="text-[10px] text-slate-400 font-normal italic">Signature & Date</div>
@@ -267,13 +276,8 @@ export const PrintableMonthlyDistribution: React.FC<PrintableMonthlyDistribution
           </div>
           <div className="space-y-12">
             <p className="tracking-wide uppercase text-[11px]">Inspector Signature</p>
-            <div className="text-[10px] text-slate-400 font-normal italic">Visa & Observation</div>
+            <div className="text-[10px] text-slate-400 font-normal italic">Visa, Stamp & Date</div>
           </div>
-        </div>
-
-        {/* Print/Export Footer */}
-        <div className="text-center text-[8.5px] text-slate-400 mt-5">
-          DidactiPlan • Algerian Primary English Curriculum • Ministry of National Education
         </div>
 
       </div>

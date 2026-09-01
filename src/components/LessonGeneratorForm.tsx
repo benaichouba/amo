@@ -89,6 +89,7 @@ export const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
   // When Grade Year changes: reset sequence & section to valid defaults
   const handleGradeYearChange = (newYear: DidacticYear) => {
     setGradeYear(newYear);
+    setDurationMinutes(newYear === '5PS' ? 45 : 60);
     const newSeqs = getSequencesForLevel(newYear);
     const firstSeq = newSeqs[0]?.number || 1;
     setSelectedSequenceNumber(firstSeq);
@@ -201,7 +202,8 @@ export const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
             {(['3PS', '4PS', '5PS'] as DidacticYear[]).map((level) => {
               const isSelected = gradeYear === level;
               const levelTitle = level === '3PS' ? '3rd Year' : level === '4PS' ? '4th Year' : '5th Year';
-              const sessionCount = level === '3PS' ? '4 Sessions / Sec' : level === '4PS' ? '5 Sessions / Sec' : '8 Sessions (Key Stage 3)';
+              const durationLabel = level === '5PS' ? '45 min/sess' : '60 min/sess';
+              const sessionCount = level === '3PS' ? '4 Sess/Sec' : level === '4PS' ? '5 Sess/Sec' : '8 Sess (KS3)';
               const learners = level === '3PS' 
                 ? teacherProfile.learners3PS 
                 : level === '4PS' 
@@ -229,7 +231,7 @@ export const LessonGeneratorForm: React.FC<LessonGeneratorFormProps> = ({
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
                       isSelected ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'
                     }`}>
-                      {learners || 30} pupils
+                      {durationLabel}
                     </span>
                   </div>
                   <div className={`text-xs font-semibold mt-0.5 ${isSelected ? 'text-emerald-100' : 'text-slate-600'}`}>

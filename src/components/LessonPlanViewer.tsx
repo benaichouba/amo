@@ -141,11 +141,11 @@ ${plan.evaluationGrid.map(g => `- **${g.domain} - ${g.criterion}**: Full: ${g.fu
             </p>
             {plan.teacherProfile && (
               <div className="pt-1 text-[11px] text-emerald-300/90 flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span>Teacher: <strong>{plan.teacherProfile.fullName}</strong></span>
+                <span>Teacher: <strong>{plan.teacherProfile.fullName || 'Primary English Teacher'}</strong></span>
                 <span>•</span>
-                <span>School: {plan.teacherProfile.schoolName}</span>
+                <span>School: {plan.teacherProfile.schoolName || 'Primary School'}</span>
                 <span>•</span>
-                <span className="italic text-emerald-200">"Created by Teacher Benaichouba Mohamed A."</span>
+                <span className="italic text-emerald-200">Official Curriculum Framework</span>
               </div>
             )}
           </div>
@@ -365,7 +365,7 @@ ${plan.evaluationGrid.map(g => `- **${g.domain} - ${g.criterion}**: Full: ${g.fu
               <div className="bg-[#fef3c7] border border-amber-300 rounded-xl p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-amber-950 font-medium">
                 <div>
                   <strong className="font-bold text-amber-900">Teacher: </strong>
-                  <span>{plan.teacherProfile?.fullName || 'Teacher Benaichouba Mohamed A.'}</span>
+                  <span>{plan.teacherProfile?.fullName || 'Primary English Teacher'}</span>
                 </div>
                 <div>
                   <strong className="font-bold text-amber-900">School: </strong>

@@ -55,10 +55,10 @@ export const DidacticGuideReferenceModal: React.FC<DidacticGuideReferenceModalPr
                 Ministry of National Education • Didactic Guide Reference
               </h3>
               <p className="text-xs text-slate-500">
-                National Curriculum Council (CNP) Standards for Primary English (3PS, 4PS, 5PS - Key Stage 3 2024)
+                National Curriculum Council (CNP) Standards for Primary English (3PS, 4PS, 5PS - Key Stage 3)
               </p>
               <p className="text-[11px] font-semibold text-emerald-700 mt-0.5">
-                "Created by Teacher Benaichouba Mohamed A."
+                Official Algerian Didactic Guide
               </p>
             </div>
           </div>
@@ -460,7 +460,7 @@ export const DidacticGuideReferenceModal: React.FC<DidacticGuideReferenceModalPr
           {refTab === 'handwriting' && (
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900">
-                <strong>Pedagogical Rule:</strong> Arabic native learners are accustomed to right-to-left cursive flow. Teaching English handwriting requires explicit motor grouping by stroke mechanics rather than alphabetical order.
+                <strong>Pedagogical Rule:</strong> Primary learners accustomed to right-to-left cursive flow require explicit motor grouping by stroke mechanics rather than alphabetical order.
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -628,7 +628,7 @@ export const DidacticGuideReferenceModal: React.FC<DidacticGuideReferenceModalPr
         {/* Modal Footer */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between shrink-0">
           <div className="text-[11px] text-slate-500 italic">
-            "Created by Teacher Benaichouba Mohamed A."
+            Official Pedagogical Reference • Algerian Primary English
           </div>
           <button
             onClick={onClose}

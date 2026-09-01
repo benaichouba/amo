@@ -15,9 +15,13 @@ import {
   Info,
   Target,
   Download,
-  Loader2
+  Loader2,
+  Landmark,
+  Clock,
+  Sliders
 } from 'lucide-react';
 import { 
+  CALENDAR_YEARS_LIST,
   DidacticYear, 
   MonthlyDistributionConfig, 
   MonthlyCalendarEvent, 
@@ -36,8 +40,14 @@ import {
   getAvailableSessionsForGrade,
   calculateStartingSession
 } from '../utils/monthlyDistributionHelper';
+import { 
+  getMinistryCalendarForYear, 
+  SeptemberConfig, 
+  SeptemberStartOption 
+} from '../utils/ministryCalendarHelper';
 import { AddEventModal } from './AddEventModal';
 import { PrintableMonthlyDistribution } from './PrintableMonthlyDistribution';
+import { MinistryCalendarModal } from './MinistryCalendarModal';
 
 interface MonthlyDistributionViewProps {
   licenseInfo: LicenseInfo;
@@ -56,9 +66,14 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
 }) => {
   // State for selections
   const [selectedGrade, setSelectedGrade] = useState<DidacticYear>('3PS');
-  const [selectedMonth, setSelectedMonth] = useState<number>(10); // October default
-  const [selectedYear, setSelectedYear] = useState<number>(2025);
+  const [selectedMonth, setSelectedMonth] = useState<number>(9); // September default
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
   
+  // September Start Configuration (Options: Ministry Official, Custom Date, Weeks 3 & 4, Full Month)
+  const [septemberMode, setSeptemberMode] = useState<SeptemberStartOption>('ministry_auto');
+  const [septemberCustomDate, setSeptemberCustomDate] = useState<string>('2026-09-20');
+  const [septemberActiveWeeks, setSeptemberActiveWeeks] = useState<number[]>([3, 4]);
+
   // Last taught session state (User indicates last taught sequence, section, and session)
   // 0 means no session taught yet (fresh start starting at Session 1)
   const [lastSequenceNumber, setLastSequenceNumber] = useState<number>(1);
@@ -77,6 +92,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
 
   // Modals & Print view state
   const [isAddEventOpen, setIsAddEventOpen] = useState<boolean>(false);
+  const [isMinistryModalOpen, setIsMinistryModalOpen] = useState<boolean>(false);
   const [isPrintView, setIsPrintView] = useState<boolean>(false);
 
   // Available options for last taught sequence, section, and session
@@ -104,6 +120,14 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
     return calculateStartingSession(selectedGrade, lastSequenceNumber, lastSectionNumber, lastSessionNumber);
   }, [selectedGrade, lastSequenceNumber, lastSectionNumber, lastSessionNumber]);
 
+  const activeSeptemberConfig: SeptemberConfig = useMemo(() => {
+    return {
+      mode: septemberMode,
+      customStartDate: septemberCustomDate,
+      activeWeeks: septemberActiveWeeks
+    };
+  }, [septemberMode, septemberCustomDate, septemberActiveWeeks]);
+
   // Generated distribution state
   const [distribution, setDistribution] = useState<MonthlyDistributionConfig>(() => {
     return generateMonthlyDistribution(
@@ -112,7 +136,8 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
       selectedGrade,
       customEvents,
       teacherProfile,
-      { sequenceNumber: 1, sectionNumber: 1, sessionNumber: 0 }
+      { sequenceNumber: 1, sectionNumber: 1, sessionNumber: 0 },
+      activeSeptemberConfig
     );
   });
 
@@ -128,7 +153,8 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
         sequenceNumber: lastSequenceNumber,
         sectionNumber: lastSectionNumber,
         sessionNumber: lastSessionNumber
-      }
+      },
+      activeSeptemberConfig
     );
     setDistribution(newDist);
   }, [
@@ -139,7 +165,8 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
     lastSequenceNumber, 
     lastSectionNumber, 
     lastSessionNumber, 
-    teacherProfile
+    teacherProfile,
+    activeSeptemberConfig
   ]);
 
   // Handle adding custom event
@@ -178,7 +205,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
     });
   };
 
-  // Quick 1-click generation of the full 60m lesson plan
+  // Quick 1-click generation of the full lesson plan (45m for 5PS, 60m for 3PS/4PS)
   const handleGenerateSessionPlan = (session: MonthlySessionPlan) => {
     const params: LessonGenerationParams = {
       subject: 'english_primary',
@@ -187,7 +214,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
       sequenceTitle: session.sequenceTitle,
       sectionTitle: session.sectionTitle,
       sessionType: session.sessionType,
-      durationMinutes: 60,
+      durationMinutes: session.year === '5PS' ? 45 : 60,
       presetId: session.presetId,
       customObjectives: session.communicativeObjectives.join('\n'),
       teacherProfile
@@ -252,7 +279,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
                 Monthly Distribution Table (4 Weeks × 2 Sessions)
               </h2>
               <p className="text-xs sm:text-sm text-amber-100 leading-relaxed">
-                Structured into <strong>4 Columns (4 Weeks) and 2 Lines (2 Sessions/week of 60 min)</strong>. Automatically aligns with the official Algerian Didactic Guide objectives, maps school holidays, and enables 1-click lesson sheet generation.
+                Structured into <strong>4 Columns (4 Weeks) and 2 Lines (2 Sessions/week of {selectedGrade === '5PS' ? '45' : '60'} min)</strong>. Automatically aligns with the official Algerian Didactic Guide objectives, maps school holidays, and enables 1-click lesson sheet generation.
               </p>
             </div>
             
@@ -272,7 +299,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               <Info className="w-4 h-4 text-amber-200" />
               <span>Interactive table preview with official Didactic Guide objectives.</span>
             </div>
-            <span className="font-semibold text-white">Academic Year: {teacherProfile.academicYear || '2025/2026'}</span>
+            <span className="font-semibold text-white">Academic Year: {teacherProfile.academicYear || '2026 / 2027'}</span>
           </div>
         </div>
       ) : (
@@ -291,7 +318,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Official Algerian Syllabus Table • <strong>4 Columns (4 Weeks) × 2 Lines (2 Sessions/week)</strong> • Academic Year: <strong className="text-slate-800">{teacherProfile.academicYear || '2025/2026'}</strong>
+                Official Algerian Syllabus Table • <strong>4 Columns (4 Weeks) × 2 Lines (2 Sessions/week)</strong> • Academic Year: <strong className="text-slate-800">{teacherProfile.academicYear || '2026 / 2027'}</strong>
               </p>
             </div>
           </div>
@@ -332,7 +359,9 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               <GraduationCap className="w-4 h-4 mr-1.5 text-emerald-600" />
               Target Class Level
             </span>
-            <span className="text-[11px] text-slate-500">Each cohort is scheduled for 2 sessions of 60 mins per week</span>
+            <span className="text-[11px] text-slate-500">
+              Each cohort is scheduled for 2 sessions of {selectedGrade === '5PS' ? '45' : '60'} mins per week
+            </span>
           </div>
 
           <div className="flex items-center space-x-3">
@@ -343,7 +372,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               title="Click to edit teacher profile and academic year"
             >
               <Calendar className="w-3.5 h-3.5 mr-1.5 text-emerald-700" />
-              <span>Year: {teacherProfile.academicYear || '2025/2026'}</span>
+              <span>Year: {teacherProfile.academicYear || '2026 / 2027'}</span>
               <Edit3 className="w-3 h-3 ml-1.5 text-slate-400" />
             </div>
 
@@ -401,13 +430,170 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               onChange={(e) => setSelectedYear(Number(e.target.value))}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 bg-white font-medium cursor-pointer"
             >
-              <option value={2025}>2025 (Trimester 1)</option>
-              <option value={2026}>2026 (Trimester 2 & 3)</option>
-              <option value={2027}>2027</option>
+              {CALENDAR_YEARS_LIST.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr} {yr === 2026 ? '(Current Academic Year)' : ''}
+                </option>
+              ))}
             </select>
           </div>
 
         </div>
+
+        {/* September School Entry Options Panel (When September is Selected) */}
+        {selectedMonth === 9 && (
+          <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 p-4 rounded-xl border border-emerald-200 shadow-2xs space-y-3 animate-in fade-in">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <div className="font-bold text-emerald-950 flex items-center space-x-1.5 text-xs sm:text-sm">
+                  <Landmark className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>ضبط وتوزيع شهر سبتمبر (September Rentrée Configuration)</span>
+                </div>
+                <p className="text-[11px] text-emerald-800 leading-relaxed">
+                  تحديد تاريخ الدخول الفعلي للتلاميذ، أو استيراد الرزنامة الرسمية لوزارة التربية الوطنية تلقائياً:
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsMinistryModalOpen(true)}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs transition-colors cursor-pointer shrink-0"
+              >
+                <Landmark className="w-3.5 h-3.5 mr-1.5 text-amber-300" />
+                <span>عرض رزنامة الوزارة (Ministry Portal Data)</span>
+              </button>
+            </div>
+
+            {/* Selection modes: Ministry auto, custom date, Weeks 3 & 4, or Full 4 weeks */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              
+              {/* Option 1: Ministry Official Date */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSeptemberMode('ministry_auto');
+                  setSeptemberActiveWeeks([3, 4]);
+                }}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                  septemberMode === 'ministry_auto'
+                    ? 'border-emerald-600 bg-white ring-2 ring-emerald-500/20 shadow-xs'
+                    : 'border-emerald-200/80 bg-white/70 hover:bg-white text-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-emerald-900">1. رزنامة الوزارة الرسمية</span>
+                  {septemberMode === 'ministry_auto' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                <p className="text-[10px] text-slate-600 leading-tight">
+                  انطلاق الدروس من الأسبوع الثالث (الدخول الرسمي 20-21 سبتمبر). الأسبوع 1 و 2 تحضير إداري وبيداغوجي.
+                </p>
+              </button>
+
+              {/* Option 2: Custom Date Input */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSeptemberMode('custom_date');
+                }}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                  septemberMode === 'custom_date'
+                    ? 'border-emerald-600 bg-white ring-2 ring-emerald-500/20 shadow-xs'
+                    : 'border-emerald-200/80 bg-white/70 hover:bg-white text-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-emerald-900">2. إدخال تاريخ بداية مخصص</span>
+                  {septemberMode === 'custom_date' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                <p className="text-[10px] text-slate-600 leading-tight">
+                  تحديد الأسبوع أو اليوم الدقيق الذي بدأت فيه الحصص في مؤسستك التربوية.
+                </p>
+              </button>
+
+              {/* Option 3: Full Month (4 Weeks / 8 Sessions) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSeptemberMode('full_month');
+                  setSeptemberActiveWeeks([1, 2, 3, 4]);
+                }}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                  septemberMode === 'full_month'
+                    ? 'border-emerald-600 bg-white ring-2 ring-emerald-500/20 shadow-xs'
+                    : 'border-emerald-200/80 bg-white/70 hover:bg-white text-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-emerald-900">3. شهر كامل (4 أسابيع كاملة)</span>
+                  {septemberMode === 'full_month' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                <p className="text-[10px] text-slate-600 leading-tight">
+                  توزيع الحصص التعليمية على الـ 4 أسابيع بالكامل (8 حصص تدريسية ابتداءً من الحصة 1).
+                </p>
+              </button>
+
+            </div>
+
+            {/* Sub-controls when Custom Date is selected */}
+            {septemberMode === 'custom_date' && (
+              <div className="p-3 bg-white rounded-xl border border-emerald-300/80 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-800 block mb-1">
+                    تاريخ انطلاق الدروس للتلاميذ (Start Date)
+                  </label>
+                  <input
+                    type="date"
+                    value={septemberCustomDate}
+                    onChange={(e) => {
+                      const dateVal = e.target.value;
+                      setSeptemberCustomDate(dateVal);
+                      const day = new Date(dateVal).getDate();
+                      // Determine week based on day
+                      if (day <= 7) setSeptemberActiveWeeks([1, 2, 3, 4]);
+                      else if (day <= 14) setSeptemberActiveWeeks([2, 3, 4]);
+                      else if (day <= 21) setSeptemberActiveWeeks([3, 4]);
+                      else setSeptemberActiveWeeks([4]);
+                    }}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-800 block mb-1">
+                    الأسابيع النشطة للتدريس في سبتمبر
+                  </label>
+                  <div className="flex items-center space-x-1.5 pt-0.5">
+                    {[1, 2, 3, 4].map((w) => {
+                      const isActive = septemberActiveWeeks.includes(w);
+                      return (
+                        <button
+                          key={w}
+                          type="button"
+                          onClick={() => {
+                            if (isActive) {
+                              if (septemberActiveWeeks.length > 1) {
+                                setSeptemberActiveWeeks(septemberActiveWeeks.filter(item => item !== w));
+                              }
+                            } else {
+                              setSeptemberActiveWeeks([...septemberActiveWeeks, w].sort());
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            isActive
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                          }`}
+                        >
+                          الأسبوع {w}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Row 3: Last Taught Progression Controls (Sequence, Section, Session) */}
         <div className="bg-emerald-50/60 rounded-xl p-4 border border-emerald-200 space-y-3">
@@ -581,7 +767,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               Monthly Distribution Grid • {selectedGrade} ({distribution.monthName})
             </h3>
             <p className="text-xs text-slate-300 mt-0.5">
-              4 Columns (4 Weeks) × 2 Lines (2 Sessions/week) • Academic Year: <strong>{teacherProfile.academicYear || '2025/2026'}</strong>
+              4 Columns (4 Weeks) × 2 Lines (2 Sessions/week) • Academic Year: <strong>{teacherProfile.academicYear || '2026 / 2027'}</strong>
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -626,7 +812,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
             <div className="bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
               <span className="text-[10px] uppercase font-bold text-slate-500 block">Academic Year</span>
               <span className="font-bold text-emerald-800">
-                {teacherProfile.academicYear || '2025/2026'}
+                {teacherProfile.academicYear || '2026 / 2027'}
               </span>
             </div>
           </div>
@@ -636,7 +822,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
               Monthly Distribution of {distribution.monthName}
             </h4>
             <p className="text-[11px] text-emerald-800 font-medium">
-              4 Weeks × 2 Sessions / Week (60 min each)
+              4 Weeks × 2 Sessions / Week ({distribution.gradeYear === '5PS' ? '45' : '60'} min each)
             </p>
           </div>
         </div>
@@ -678,7 +864,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
                         Session {sessNum}
                       </div>
                       <span className="inline-block px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 text-[10px] font-bold">
-                        60 Minutes
+                        {distribution.gradeYear === '5PS' ? '45' : '60'} Minutes
                       </span>
                     </div>
                   </td>
@@ -733,11 +919,16 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
                           {/* Top: Sequence & Section */}
                           <div className="space-y-2">
                             
-                            {/* Sequence Tag */}
-                            <div className="flex items-center justify-between gap-1">
+                            {/* Sequence Tag & Special Badges */}
+                            <div className="flex flex-wrap items-center justify-between gap-1">
                               <span className="px-2 py-0.5 rounded-md font-bold text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-200">
                                 {session.sequenceTitle}
                               </span>
+                              {session.sessionType.includes('First Encounter') && !session.isSuspended && (
+                                <span className="px-1.5 py-0.5 rounded-md font-extrabold text-[9px] bg-amber-100 text-amber-900 border border-amber-300 flex items-center">
+                                  Introductions & Rules
+                                </span>
+                              )}
                               {isTaught && (
                                 <span className="px-1.5 py-0.2 rounded-md font-bold text-[9px] bg-emerald-600 text-white flex items-center">
                                   <CheckCircle2 className="w-3 h-3 mr-0.5" /> Done
@@ -800,14 +991,14 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
                               <span>{isTaught ? 'Taught' : 'Mark Done'}</span>
                             </button>
 
-                            {/* 1-Click Generate 60m Lesson Plan */}
+                            {/* 1-Click Generate Lesson Plan */}
                             <button
                               onClick={() => handleGenerateSessionPlan(session)}
                               className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shadow-2xs transition-all cursor-pointer flex items-center space-x-1"
-                              title="Load this session into Lesson Plan Studio to generate the official 60-minute lesson plan"
+                              title={`Load this session into Lesson Plan Studio to generate the official ${distribution.gradeYear === '5PS' ? '45' : '60'}-minute lesson plan`}
                             >
                               <Zap className="w-3 h-3 text-amber-300" />
-                              <span>Generate 60m Plan</span>
+                              <span>Generate {distribution.gradeYear === '5PS' ? '45m' : '60m'} Plan</span>
                             </button>
 
                           </div>
@@ -826,7 +1017,7 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
 
         {/* Footer Note */}
         <div className="bg-slate-50 px-5 py-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <span>* Each week comprises 2 pedagogical sessions of 60 minutes as prescribed by the Ministry of National Education.</span>
+          <span>* Each week comprises 2 pedagogical sessions of {distribution.gradeYear === '5PS' ? '45' : '60'} minutes as prescribed by the Ministry of National Education.</span>
           <button
             onClick={() => setIsPrintView(true)}
             className="text-emerald-700 font-bold hover:underline cursor-pointer flex items-center"
@@ -845,6 +1036,18 @@ export const MonthlyDistributionView: React.FC<MonthlyDistributionViewProps> = (
         onAddEvent={handleAddCustomEvent}
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
+      />
+
+      {/* Official Ministry Calendar & School Holidays Modal */}
+      <MinistryCalendarModal
+        year={selectedYear}
+        isOpen={isMinistryModalOpen}
+        onClose={() => setIsMinistryModalOpen(false)}
+        onApplyEntryDate={(dateStr, activeWks) => {
+          setSeptemberMode('ministry_auto');
+          setSeptemberCustomDate(dateStr);
+          setSeptemberActiveWeeks(activeWks);
+        }}
       />
 
     </div>
